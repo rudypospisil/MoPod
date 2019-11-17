@@ -1,0 +1,147 @@
+body { background-color: #212529; color: #fff; }
+
+#lnCredit {
+  overflow: visible;
+  position: absolute;
+  right: 10px;
+  top: 52px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+#lnCredit a {
+	color: #fff;
+	text-decoration: underline;
+}
+p#logo {
+	position: absolute;
+  right: 20px;
+  color: #000;
+  top: -14px;
+  font-size: 3rem;
+  display: block;
+}
+
+.playerIcon:before {
+	content: url(/static/img/icon_audio.png);
+	width: 50%;
+	padding-right: 4px;
+	margin-bottom: -4px;
+}
+
+#player .img-fluid {
+  width: 100%;
+  max-width: 300px;
+}
+
+audio { background-color: #fff; }
+
+#audioControls {
+  width: 300px; 
+  display: block; 
+}
+#audioControls img:hover {
+  cursor: pointer;
+}
+
+button:hover { cursor: pointer; background-color: #ddd; }
+
+#search form { margin: 0 0 1rem; }
+#searchResults audio { width: 150px; }
+#searchResults h1,
+#searchResults h2,
+#searchResults p { font-size: 0.9rem; }
+
+#genres { margin: 0 0 1rem; }
+#genres p { margin: 1rem 0 0.25rem; }
+#genres label,
+#subscriptions label {
+  margin-bottom: .5rem;
+  padding: 0 1rem 0 .25rem;
+}
+div.genre { 
+	display: inline-block;
+	white-space: nowrap; 
+}
+
+h1 { margin-bottom: 1.5rem; }
+
+#subscriptions a,
+#laterList a,
+#roulette a,
+#search a { color: #fff; text-decoration: underline; }
+#subscriptions h2,
+#laterList h2,
+#player h2, 
+#roulette h2 { font-size: 1.5em; }
+#subscriptions p,
+#laterList p { font-size: 0.9rem; }
+
+.publisher { font-style: italic; }
+
+.remove { font-size: 0.9rem; }
+
+div#laterListResults,
+div#subscriptionResults { 
+  display: contents; 
+}
+
+.date {
+  margin-bottom: -0.1rem;
+}
+.time {
+  margin: -0.75rem 0 2rem;
+  font-style: italic;
+}
+
+/* Style the tab */
+#tabs {
+	position: fixed;
+	width: 100%;
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+  margin-top: -50px;
+  z-index: 10000;
+}
+
+/* Style the buttons inside the tab */
+#tabs button {
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+#tabs button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+#tabs button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabContent {
+	margin-top: 50px;
+  display: none;
+  padding: 6px 12px;
+  -webkit-animation: fadeEffect 1s;
+  animation: fadeEffect 1s;
+}
+
+/* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}

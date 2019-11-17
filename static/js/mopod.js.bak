@@ -1,0 +1,515 @@
+var mopod = 
+{
+	
+	init: function()
+	{
+		document.getElementById("roulette").style.display = "block";
+		mopod.getGenres();
+		mopod.getLaterList();
+		mopod.getSubscriptions();
+	},
+	
+	
+	
+	listenNotes: function(url)
+	{
+		let reqObj, reqUrl;
+    // Create HTTP request object.
+    reqObj = new XMLHttpRequest();
+    // Construct the webservice URL.
+    reqUrl = "/roulette";   
+    // Set up the get request.
+    reqObj.open("GET", reqUrl, true);    
+    // Send request. Parameters are in URL.
+    reqObj.send();  
+	},
+	
+	
+	
+	spinRoulette: function()
+	{
+		let pubDate = "";
+		let payload = "";
+		let reqObj, reqUrl;
+    // Create HTTP request object.
+    reqObj = new XMLHttpRequest();
+    // Construct the webservice URL.
+    reqUrl = "/spinRoulette";   
+    // Set up the get request.
+    reqObj.open("GET", reqUrl, true);    
+    // Send request. Parameters are in URL.
+    reqObj.send();    
+    // Upon successful webservice return...
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+	      // Make the return into json.
+        jObj = JSON.parse(reqObj.response);
+        pubDate = new Date(jObj.pub_date_ms);
+        
+        payload += "<div class=\"row\">";
+				payload += "<div class=\"col-12\">";			
+				payload += "<button onclick=\"mopod.spinRoulette();\">Spin Again</button>";
+				payload += "<button onclick=\"mopod.insertLaterList('" + jObj.id + "');\">Save for Later</button>";
+				payload += "<button onclick=\"mopod.insertSubscription('" + jObj.podcast_id + "');\">Subscribe</button>";
+				payload += "</div>";
+				payload += "</div><br>";
+				payload += "  <div class=\"row\">";
+				payload += "    <div class=\"col-12 col-lg-6\">";
+				payload += "      <img class=\"img-fluid\" src=\"" + jObj.thumbnail + "\" />";
+				//payload += "      <audio controls><source src=\"" + jObj.audio + "\" /></audio>";
+				payload += "    </div>";
+				payload += "    <div class=\"col-12 col-lg-6\">";
+				payload += "      <h1 class=\"podcastTitle\">" + jObj.podcast_title + "</h1>";
+				payload += "      <p class=\"publisher\">" + jObj.publisher + "</p>";
+				payload += "      <h2 class=\"episodeTitle\"><a href=\"javascript: mopod.play('" + jObj.id + "');\">" + jObj.title + "</a></h2>";
+				payload += "      <p class=\"pubDate\">" + pubDate + "</p>";
+				payload += "      <p class=\"episodeDescription\">" + jObj.description + "</p>";
+				payload += "    </div>";
+			  payload += "  </div>";
+
+			  
+				document.getElementById("rouletteResult").innerHTML = payload;
+				
+				document.getElementById("rouletteResult").setAttribute("data-episodeid", jObj.id);
+				document.getElementById("rouletteResult").setAttribute("data-podcastid", jObj.podcast_id);
+      }
+		}
+	},
+	
+	
+	
+	getGenres: function()
+	{
+		let i = 0;
+		let payload = "";
+		let genres = [];
+		let jObj = {};
+		let reqObj = new XMLHttpRequest();
+    let reqUrl = "/getGenres"; 
+    reqObj.open("GET", reqUrl, true);    
+    reqObj.send();    
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+        jObj = JSON.parse(reqObj.response);
+        //console.log(jObj);
+        
+        payload += "<p>Category:</p>";
+        payload += "<select id=\"genreDropdown\">";
+        
+        for(i = 0; i < jObj.length; i++)
+        {
+	        payload += "  <option value=\"" + jObj[i][0] + "\">" + jObj[i][1] +"</option>";
+        }
+        
+        document.getElementById("genres").innerHTML = payload;
+      }
+    }
+  },
+  
+  
+  
+	search: function()
+	{
+		let i = 0, j = 0, k = 0;
+		let payload = "";
+		let pubDate = "";
+		let reqObj, reqUrl, jObj;
+		let searchType = "";
+		let genre = "";
+    
+    document.getElementById("searchResults").innerHTML = "<img src=\"/static/img/loading.gif\" width=\"50\" />";
+    
+    // Check if user wants overall podcast or specific episodes.
+		let searchTypes = document.getElementsByName("searchType");
+		for(j = 0; j < searchTypes.length; j++)
+		{
+			if(searchTypes[j].checked === true)
+			{
+				searchType = searchTypes[j].value;
+			}
+			else
+			{
+				searchType = "episode"
+			}
+		}
+		
+		// Check which category to search within.
+		let genres = document.getElementById('genreDropdown').options;
+		genre = genres[genres.selectedIndex].value;
+		if(genre === "")
+		{
+			alert("Please choose a category.");
+			return false;
+		}	
+		
+    // Create HTTP request object.
+    reqObj = new XMLHttpRequest();
+    // Construct the webservice URL.
+    reqUrl = "/search?query=" + document.getElementById("searchInput").value + "&type=" + searchType + "&genreId=" + genre;  
+    // Set up the get request.
+    reqObj.open("GET", reqUrl, true);    
+    // Send request. Parameters are in URL.
+    reqObj.send();    
+    // Upon successful webservice return...
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+	      // Make the return into json.
+        jObj = JSON.parse(reqObj.response);
+        console.log(jObj);
+        
+        payload = "<div class=\"row\">";
+        
+        if(jObj.count > 0)
+        {
+	        for(i = 0; i < jObj.count; i++)
+	        {
+		        pubDate = new Date(jObj.results[i].pub_date_ms);
+		        
+		        payload += "<div class=\"col-6 col-lg-2 searchResult\" data-episodeid=\"" + jObj.results[i].id + "\" data-podcastid=\"" + jObj.results[i].podcast_id + "\">";
+		        payload += "<img class=\"img-fluid\" src=\"" + jObj.results[i].thumbnail + "\" />";
+		        payload += "<button onclick=\"mopod.insertSubscription('" + jObj.results[i].podcast_id + "');\">Subscribe</button>";
+		        if(searchType === "episode")
+		        {
+			        payload += "<button onclick=\"mopod.laterList('" + jObj.results[i].id + "');\">Save for Later</button>";
+		        }
+						payload += "<h2 class=\"podcastTitle\">" + jObj.results[i].podcast_title_original + "</h2>";
+						payload += "<p class=\"publisher\">" + jObj.results[i].publisher_original + "</p>";
+						payload += "<h2 class=\"episodeTitle\">";
+						if(searchType === "episode")
+						{
+							payload += "<a href=\"javascript: mopod.play('" + jObj.results[i].id + "');\">";
+						}
+						payload += jObj.results[i].title_original;
+						if(searchType === "episode")
+						{
+							payload += "</a>";
+						}					
+						payload += "</h2>";
+						payload += "<p class=\"pubDate\">" + pubDate + "</p>";
+		        payload += "</div>";
+					}
+				}
+				else
+				{
+					payload += "No results.";
+				}
+				
+				payload += "</div>";
+				
+				document.getElementById("searchResults").innerHTML = payload;
+      }
+		}		
+	},
+	
+	
+	
+	insertLaterList: function(id)
+	{
+		let reqObj, reqUrl;
+		
+		//let id = document.getElementById(eId).dataset.episodeid;
+		
+		reqObj = new XMLHttpRequest();
+    reqUrl = "/insertLaterList?episodeid=" + id;   
+    reqObj.open("GET", reqUrl, true);    
+    reqObj.send();
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+				mopod.getLaterList();
+					      
+	      mopod.openTab(null, "laterList");
+				document.getElementsByClassName("tabLinks")[3].className += " active";
+			}
+		}
+    
+	},
+
+
+	
+	
+	deleteLaterList: function(id)
+	{
+		let reqObj, reqUrl;
+		
+		reqObj = new XMLHttpRequest();
+    reqUrl = "/deleteLaterList?episodeid=" + id;   
+    reqObj.open("GET", reqUrl, true);    
+    reqObj.send();
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+				mopod.getLaterList();
+			}
+		}
+	},
+	
+	
+	
+	
+	deleteSubscription: function(id)
+	{
+		let reqObj, reqUrl;
+		
+		reqObj = new XMLHttpRequest();
+    reqUrl = "/deleteSubscription?podcastid=" + id;   
+    reqObj.open("GET", reqUrl, true);    
+    reqObj.send();
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+				mopod.getSubscriptions();
+			}
+		}
+	},
+	
+	
+	
+	
+	getLaterList: function()
+	{
+		let i = 0;
+		let payload = "";
+		let jObj = {};
+		let reqObj = new XMLHttpRequest();
+    let reqUrl = "/getLaterList";   
+    
+    document.getElementById("laterListResults").innerHTML = "<img src=\"/static/img/loading.gif\" width=\"50\" />";
+    
+    reqObj.open("GET", reqUrl, true);    
+    reqObj.send();
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+	      jObj = JSON.parse(reqObj.response);
+	      
+	      payload = "<div class=\"row\">";
+        
+        for(i = 0; i < jObj.length; i++)
+        {
+	        pubDate = new Date(jObj[i].pub_date_ms);
+	        
+	        payload += "<div class=\"col-6 col-lg-2\">";
+	        payload += "  <img class=\"img-fluid\" src=\"" + jObj[i].thumbnail + "\" alt=\"\" />";
+	        payload += "  <a class=\"remove\" href=\"javascript:mopod.deleteLaterList('" + jObj[i].id + "')\">Remove</a>";
+					payload += "  <h2 class=\"podcastTitle\">" + jObj[i].podcast.title + "</h2>";
+					payload += "    <p class=\"publisher\">" + jObj[i].podcast.publisher + "</p>";
+					payload += "  <p class=\"episode\"><a href=\"javascript: mopod.play('" + jObj[i].id + "');\">" + jObj[i].title + "</a></p>";
+					payload += "  </div>";
+				}
+				
+				payload += "</div>";
+				
+	      document.getElementById("laterListResults").innerHTML = payload;
+
+	      //console.log(jObj);
+	    }
+    }
+	},
+	
+	
+	
+	insertSubscription: function(id)
+	{
+		//let id = document.getElementById(eId).dataset.episodeid;
+		
+		reqObj = new XMLHttpRequest();
+    reqUrl = "/insertSubscription?podcastid=" + id;   
+    reqObj.open("GET", reqUrl, true);    
+    reqObj.send();
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+	      mopod.getSubscriptions();
+				mopod.openTab(null, "subscriptions");
+				document.getElementsByClassName("tabLinks")[4].className += " active";
+			}
+		}
+	},
+	
+	//let episodeQty = document.querySelector('input[name="episodeQty"]:checked').value;
+	
+	getSubscriptions: function(episodeQty = 3)
+	{
+		let i = 0, j = 0, k = 0;
+		let payload = "";
+		let jObj = {};
+		let reqObj = new XMLHttpRequest();
+    let reqUrl = "/getSubscriptions";   
+    
+    document.getElementById("subscriptionResults").innerHTML = "<img src=\"/static/img/loading.gif\" width=\"50\" />";
+    
+    reqObj.open("GET", reqUrl, true);    
+    reqObj.send();
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+	      jObj = JSON.parse(reqObj.response);
+	      //console.log(jObj);
+	      
+	      payload = "<div class=\"row\">";
+	      
+        payload += "<div class=\"col-12\">";
+        payload += "<p>Quantity of episodes to display per podcast... (sorted by newest first) ";
+				payload += "<input type=\"radio\" name=\"episodeQty\" value=\"1\">";
+				payload += "<label for=\"1\">1</label>";
+				payload += "<input type=\"radio\" name=\"episodeQty\" value=\"3\" checked=\"true\">";
+				payload += "<label for=\"3\">3</label>";
+				payload += "<input type=\"radio\" name=\"episodeQty\" value=\"5\">";
+				payload += "<label for=\"5\">5</label>";
+				payload += "<input type=\"radio\" name=\"episodeQty\" value=\"10\">";
+				payload += "<label for=\"10\">10</label>";
+				payload += "</p></div>";    
+					    
+        for(i = 0; i < jObj.length; i++)
+        {
+	        if(jObj[i] && Object.keys(jObj[i]).length !== 0)
+	        {
+		        pubDate = new Date(jObj[i].pub_date_ms);
+		 
+		        payload += "<div class=\"col-6 col-lg-2\">";
+		        payload += "  <img class=\"img-fluid\" src=\"" + jObj[i].thumbnail + "\" alt=\"" + jObj[i].description + "\" />";
+		        payload += "  <a class=\"remove\" href=\"javascript:mopod.deleteSubscription('" + jObj[i].id + "')\">Remove</a>";
+						payload += "  <h2 class=\"podcastTitle\">" + jObj[i].title + "</h2>";
+						payload += "    <p class=\"publisher\">" + jObj[i].publisher + "</p>";
+						payload += "  <div class=\"episodes\">";					
+						
+						for(j = 0; j < episodeQty; j++)
+						{
+							if(jObj[i].episodes[j] && Object.keys(jObj[i].episodes[j]).length !== 0)
+							{
+								payload += "  <p class=\"episode\"><a href=\"javascript: mopod.play('" + jObj[i].episodes[j].id + "');\">" + jObj[i].episodes[j].title + "</a></p>";
+							}
+						}
+						
+						payload += "  </div>";
+		        payload += "</div>";
+		      }
+				}
+				
+				payload += "</div>";
+				
+	      document.getElementById("subscriptionResults").innerHTML = payload;
+	      
+	      let quantities = document.getElementsByName("episodeQty");
+	      for(k = 0; k < quantities.length; k++)
+	      {
+		      quantities[k].onclick = function()
+		      {
+			      mopod.getSubscriptions(this.value);
+		      }
+	      }
+	    }
+    }
+	},
+	
+	
+	
+	play: function(id)
+	{
+		let pubDate = "";
+		let payload = "";
+		let reqObj, reqUrl;
+    // Create HTTP request object.
+    reqObj = new XMLHttpRequest();
+    // Construct the webservice URL.
+    reqUrl = "/getEpisode?id=" + id;   
+    // Set up the get request.
+    reqObj.open("GET", reqUrl, true);    
+    // Send request. Parameters are in URL.
+    reqObj.send();    
+    // Upon successful webservice return...
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
+      {
+	      // Make the return into json.
+        jObj = JSON.parse(reqObj.response);
+        //console.log(jObj);
+        
+        pubDate = new Date(jObj.pub_date_ms);
+        
+				payload += "  <div class=\"row\">";
+				payload += "    <div class=\"col-12 col-lg-6\">";
+				payload += "			<button onclick=\"mopod.insertLaterList('" + jObj.id + "');\">Save for Later</button>";
+				payload += "			<button onclick=\"mopod.insertSubscription('" + jObj.podcast.id + "');\">Subscribe</button><br><br>";
+				payload += "      <img class=\"img-fluid\" src=\"" + jObj.thumbnail + "\" /><br><br>";
+				payload += "      <div id=\"audioControls\">";
+				payload += "      	<audio controls><source src=\"" + jObj.audio + "\" /></audio>";
+				payload += "				<img src=\"/static/img/icon_rewind.png\" onclick=\"javascript: mopod.rewind();\" />";
+				payload += "				<img src=\"/static/img/icon_forward.png\" onclick=\"javascript: mopod.forward();\" />";
+				payload += "    	</div>";
+				payload += "    </div>";
+				payload += "    <div class=\"col-12 col-lg-6\">";
+				payload += "      <h1 class=\"podcastTitle\">" + jObj.podcast.title + "</h1>";
+				payload += "      <p class=\"publisher\">" + jObj.podcast.publisher + "</p>";
+				payload += "      <h2 class=\"episodeTitle\">" + jObj.title + "</h2>";
+				payload += "      <p class=\"pubDate\">" + pubDate + "</p>";
+				payload += "      <p class=\"description\">" + jObj.description + "</p>";
+				payload += "    </div>";
+			  payload += "  </div>";
+			  
+				document.getElementById("playerResult").innerHTML = payload;
+				
+				document.getElementById("playerResult").setAttribute("data-episodeid", jObj.id);
+				document.getElementById("playerResult").setAttribute("data-podcastid", jObj.podcast_id);
+				
+				mopod.openTab(null, "player");
+				document.getElementsByClassName("tabLinks")[0].className += " active";
+      }
+		}
+	},
+	
+	
+	
+	rewind: function()
+	{
+		audio = document.getElementById("audioControls").getElementsByTagName("audio")[0];
+		audio.currentTime -= 10.0;
+	},
+	
+	
+	
+	forward: function()
+	{
+		audio = document.getElementById("audioControls").getElementsByTagName("audio")[0];
+		audio.currentTime += 10.0;
+	},
+	
+	
+	
+	openTab: function(evt, panel) 
+	{
+	  var i, tabContent, tabLinks;
+	  tabContent = document.getElementsByClassName("tabContent");
+	  for (i = 0; i < tabContent.length; i++) {
+	    tabContent[i].style.display = "none";
+	  }
+	  tabLinks = document.getElementsByClassName("tabLinks");
+	  for (i = 0; i < tabLinks.length; i++) {
+	    tabLinks[i].className = tabLinks[i].className.replace(" active", "");
+	  }
+	  document.getElementById(panel).style.display = "block";
+	  if(evt !== null)
+	  {
+		  evt.currentTarget.className += " active";
+	  }
+	  
+	}
+	
+
+	
+	
+}

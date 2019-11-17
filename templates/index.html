@@ -1,0 +1,144 @@
+{% include "header.html" %}
+<div id="mopod">
+
+	<div id="tabs" class="tab">
+	  <button class="tabLinks" onclick="mopod.openTab(event, 'player')">Player</button>
+	  <button class="tabLinks active" onclick="mopod.openTab(event, 'roulette')">Roulette</button>
+	  <button class="tabLinks" onclick="mopod.openTab(event, 'search')">Search</button>
+	  <button class="tabLinks" onclick="mopod.openTab(event, 'laterList')">Later List</button>
+	  <button class="tabLinks" onclick="mopod.openTab(event, 'subscriptions')">Subscriptions</button>
+	  <button class="tabLinks" onclick="mopod.openTab(event, 'account')">Account</button>
+	  <p id="logo">mopod</p>
+	</div>
+	<p id="lnCredit"><a href="https://www.listennotes.com/" target="_blank">Powered by Listen Notes</a></p>
+	<div id="player" class="tabContent">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<h1>mopod Player</h1>
+					<div id="playerResult"><p>Choose an episode from Roulette, Search, Later List, or Subscriptions and it will appear here.</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="roulette" class="tabContent">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<h1>mopod Roulette</h1>
+				</div>
+			</div>
+			<div id="rouletteResult" data-episodeid="{{ result["id"] }}" data-podcastid="{{ result["podcast_id"] }}">
+				<div class="row">
+					<div class="col-12">			
+						<button onclick="mopod.spinRoulette();">Spin Again</button>
+						<button onclick="mopod.insertLaterList('{{ result["id"] }}');">Save for Later</button>
+						<button onclick="mopod.insertSubscription('{{ result["podcast_id"] }}');">Subscribe</button>
+					</div>
+				</div>
+				<br>
+				<div class="row">
+					<div class="col-12 col-lg-6">	
+						<img class="img-fluid" src="{{ result["thumbnail"] }}" />
+					</div>
+					<div class="col-12 col-lg-6">
+						<h1 class="podcastTitle">{{ result["podcast_title"] }}</h1>
+						<p class="publisher">{{ result["publisher"] }}</p>
+						<h2 class="episodeTitle"><a href="javascript: mopod.play('{{ result["id"] }}');">{{ result["title"] }}</a></h2>
+						<p class="pubDate">{{ result["pubDate"] }}</p>
+						<p class="episodeDescription">{{ result["episodeDescription"] }}</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+			
+	<div id="search" class="tabContent">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<h1>mopod Search</h1>
+					<div id="searchBox">
+						<p>Search for...</p>
+						<input type="radio" id="episode" name="searchType" value="episode">
+						<label for="episode">Episode</label>
+						<input type="radio" id="podcast" name="searchType" value="podcast" checked="true">
+						<label for="podcast">Podcast</label>
+						<div id="genres"></div>
+						<form method="post" action="javascript: mopod.search();" />
+							<input id="searchInput" name="searchInput" type="text" placeholder="search term"/>
+							<input type="submit" value="Search" />
+						</form>
+						<a href="javascript: mopod.searchNext10();">Next 10 Results</a>>
+					</div>
+				</div>
+			</div>	
+			<div id="searchResults"></div>
+		</div>
+	</div>
+
+	<div id="laterList" class="tabContent">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<h1>mopod Later List</h1>
+				</div>
+			</div>
+			<div class="row">
+				<div id="laterListResults">Add episodes in the Roulette or Search panels.</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="subscriptions" class="tabContent">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<h1>mopod Subscriptions</h1>
+				</div>
+			</div>	
+			<!--
+			<div class="row">
+        <div class="col-12">
+          <p>Quantity of episodes to display per podcast... (sorted by newest first)
+        	<input type="radio" name="episodeQty" value="1">
+        	<label for="1">1</label>
+	        <input type="radio" name="episodeQty" value="3" checked="true">
+	        <label for="3">3</label>
+	        <input type="radio" name="episodeQty" value="5">
+	        <label for="5">5</label>
+	        <input type="radio" name="episodeQty" value="10">
+	        <label for="10">10</label>
+	        </p>
+	      </div>
+	    </div>
+	    -->
+	   	<div class="row">
+				<div id="subscriptionResults">Add subscriptions in the Roulette or Search panels.</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="account" class="tabContent">
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<h1>mopod Account</h1>
+				</div>
+			</div>	
+			<div id="accountResults">
+				<p>An account is not necessary unless you want to keep a record of your Subscriptions and Later List. If not, your Subscriptions and Later List will disappear when closing your browser.</p>
+				<form method="post" action="javascript:mopod.login();" />
+					<input id="login" name="login" type="text" placeholder="username"/>
+					<input id="password" name="password" type="password" placeholder="password" />
+					<input type="submit" value="Log In" />
+				</form>
+				<p>Don't have an account?</p>
+				<button onclick="">Register</button>
+			</div>
+		</div>
+	</div>
+</div>
+		
+<script>mopod.init();</script>
