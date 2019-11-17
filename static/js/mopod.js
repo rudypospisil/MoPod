@@ -25,7 +25,7 @@ var mopod =
     document.getElementById("roulette").style.display = "block";
     // 
     mopod.getGenres();
-    //mopod.getLaterListFromAPI();
+    mopod.getLaterListFromAPI();
     mopod.getSubscriptionsFromAPI();
   },
   

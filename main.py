@@ -24,6 +24,15 @@ config.read("/home/pi/mopod/config.py")
 DATABASE = config.get("config", "DATABASE")
 LNKEY = config.get("config", "LNKEY")
 
+qLOGIN = config.get("sql", "qLOGIN")
+qGENRE = config.get("sql", "qGENRE")
+qINSLL = config.get("sql", "qINSLL")
+qUPDLL = config.get("sql", "qINSLL")
+qSELSUB = config.get("sql", "qSELSUB")
+qSELLL = config.get("sql", "qSELLL")
+qINSSUB = config.get("sql", "qINSSUB")
+qUPDSUB = config.get("sql", "qUPDSUB")
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -47,7 +56,7 @@ def login():
 
 		sessionId = str(uuid.uuid4())
 		
-		query = "INSERT INTO sessions (sessionId, userId, timestamp) VALUES (?, ?, DATE());"
+		query = qLOGIN
 		
 		userId = 0
 
@@ -135,7 +144,7 @@ def getEpisode():
 @app.route('/getGenres', methods=['GET', 'POST'])	
 def getGenres():
 		genres = []
-		query = "SELECT ID, Name FROM genres WHERE IsEnabled = 1 ORDER BY Name;"
+		query = qGENRE
 		
 		try:
 				conn = sqlite3.connect(DATABASE)
@@ -164,7 +173,7 @@ def getGenres():
 @app.route('/insertLaterList', methods=['GET', 'POST'])		
 def insertLaterList():
 		episodeId = request.args.get('episodeid')
-		query = "INSERT INTO laterList ('userId', 'episodeId', 'isEnabled', 'timestamp') VALUES (?,?,?,date());"
+		query = qINSLL
 		
 		try:
 				conn = sqlite3.connect(DATABASE)
@@ -185,7 +194,7 @@ def insertLaterList():
 @app.route('/deleteLaterList', methods=['GET', 'POST'])		
 def deleteLaterList():
 		episodeId = request.args.get('episodeid')
-		query = "UPDATE laterList SET isEnabled = 0 WHERE userId = ? AND episodeId = ?;"
+		query = qUPDLL
 		
 		try:
 				conn = sqlite3.connect(DATABASE)
@@ -208,7 +217,7 @@ def getSubscriptions():
 		podcastIDs = ""
 		counter = 0
 		offset = 10
-		query = "SELECT podcastId FROM subscriptions WHERE userId = 0 AND isEnabled = 1;"
+		query = qSELSUB
 		subscriptions = []
 		podcasts = ""
 		
@@ -262,7 +271,7 @@ def getSubscription():
 @app.route('/getLaterList')		
 def getLaterList():
 		laterList = []
-		query = "SELECT episodeId FROM laterList WHERE userId = 0 AND isEnabled = 1;"
+		query = qSELLL
 		episodeIDs = ""
 		
 		try:
@@ -294,7 +303,7 @@ def getLaterList():
 @app.route('/_getLaterList')		
 def _getLaterList():
 		laterList = []
-		query = "SELECT episodeId FROM laterList WHERE userId = 0 AND isEnabled = 1;"
+		query = qSELLL
 		
 		try:
 				conn = sqlite3.connect(DATABASE)
@@ -333,20 +342,20 @@ def insertSubscription():
 				# string
 				#podcast = getPodcast(id)
 				# dict
+				# Need to call for the podcast singlely in order to get the last episode date. This isn't in the POST response.
 				podcast = json.loads(getPodcast(id))
 				# dict_keys(['id', 'title', 'publisher', 'image', 'thumbnail', 'listennotes_url', 'total_episodes', 'explicit_content', 'description', 'itunes_id', 'rss', 'latest_pub_date_ms', 'earliest_pub_date_ms', 'language', 'country', 'website', 'extra', 'is_claimed', 'email', 'looking_for', 'genre_ids', 'episodes', 'next_episode_pub_date'])
 				#pdb.set_trace()
 				ms = podcast.get("latest_pub_date_ms")
 				
-				query = "INSERT INTO subscriptions ('userId', 'podcastId', 'isEnabled', 'timestamp', 'latestPubDateMs') VALUES (?,?,?,date(),?);"
+				query = qINSSUB
 				
 				try:
 						conn = sqlite3.connect(DATABASE)
 						cursor = conn.cursor()				
 						cursor.execute(query, (0, id, 1, ms))
 						conn.commit()
-		
-						
+								
 						return podcast
 						
 				except sqlite3.Error as err:
@@ -364,7 +373,7 @@ def postSubscriptions():
 	
 		subscriptions = []
 		
-		query = "SELECT podcastId FROM subscriptions WHERE userId = 0 AND isEnabled = 1;"
+		query = qSELSUB
 		
 		ids = ""
 		
@@ -395,7 +404,7 @@ def postSubscriptions():
 @app.route('/deleteSubscription', methods=['GET', 'POST'])		
 def deleteSubscription():
 		podcastId = request.args.get('podcastid')
-		query = "UPDATE subscriptions SET IsEnabled = 0 WHERE userId = ? AND podcastId = ?;"
+		query = qUPDSUB
 		
 		try:
 				conn = sqlite3.connect(DATABASE)
