@@ -1,5 +1,9 @@
 body { background-color: #212529; color: #fff; }
 
+#playerResult button { display: block; }
+
+.container { max-width: 100%; }
+
 #lnCredit {
   overflow: visible;
   position: absolute;
@@ -28,9 +32,36 @@ p#logo {
 	margin-bottom: -4px;
 }
 
-#player .img-fluid {
+ .img-fluid {
   width: 100%;
   max-width: 300px;
+}
+
+#playerResult li {
+	text-indent: 6px;
+}
+#playerResult li:hover {
+	cursor: pointer;
+}
+#playerResult li.active {
+	color: #999;
+}
+#playerResult li.active::before {
+	content: url(/static/img/icon_audio.png);
+	width: 50%;
+	margin-left: -50px;
+  margin-right: 26px;
+}
+
+span.newEpisode.new {
+  background-image: url(/static/img/icon_newEpisode.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 48px;
+  height: 48px;
+  display: inline-block;
+  position: absolute;
+  filter: opacity(0.75);
 }
 
 audio { background-color: #fff; }
@@ -65,11 +96,21 @@ div.genre {
 
 h1 { margin-bottom: 1.5rem; }
 
+#search button,
+#subscriptions button { width: 100%; background-color: rgba(255,255,255,0.75); }
+#subscriptions button:hover,
+#search button:hover { background-color: rgba(255,255,255,0.5); }
+
+#subscriptions button.play { margin-bottom: 0.5rem; }
+#subscriptions button.remove { font-size: 0.7rem; background-color: rgba(255,255,255,0.9); }
+#subscriptions h2 { font-size: 1.3rem; }
+
 #subscriptions a,
 #laterList a,
 #roulette a,
 #search a { color: #fff; text-decoration: underline; }
-#subscriptions h2,
+
+
 #laterList h2,
 #player h2, 
 #roulette h2 { font-size: 1.5em; }
@@ -77,8 +118,6 @@ h1 { margin-bottom: 1.5rem; }
 #laterList p { font-size: 0.9rem; }
 
 .publisher { font-style: italic; }
-
-.remove { font-size: 0.9rem; }
 
 div#laterListResults,
 div#subscriptionResults { 

@@ -39,15 +39,18 @@
 				</div>
 				<br>
 				<div class="row">
-					<div class="col-12 col-lg-6">	
+					<div class="col-12 col-lg-4">	
 						<img class="img-fluid" src="{{ result["thumbnail"] }}" />
 					</div>
-					<div class="col-12 col-lg-6">
+					<div class="col-12 col-lg-4">
 						<h1 class="podcastTitle">{{ result["podcast_title"] }}</h1>
 						<p class="publisher">{{ result["publisher"] }}</p>
 						<h2 class="episodeTitle"><a href="javascript: mopod.play('{{ result["id"] }}');">{{ result["title"] }}</a></h2>
 						<p class="pubDate">{{ result["pubDate"] }}</p>
 						<p class="episodeDescription">{{ result["episodeDescription"] }}</p>
+					</div>
+					<div class="col-12 col-lg-4 ad">	
+						
 					</div>
 				</div>
 			</div>
@@ -60,17 +63,16 @@
 				<div class="col-12">
 					<h1>mopod Search</h1>
 					<div id="searchBox">
-						<p>Search for...</p>
 						<input type="radio" id="episode" name="searchType" value="episode">
 						<label for="episode">Episode</label>
 						<input type="radio" id="podcast" name="searchType" value="podcast" checked="true">
 						<label for="podcast">Podcast</label>
 						<div id="genres"></div>
-						<form method="post" action="javascript: mopod.search();" />
+						<form method="post" action="javascript: mopod.search(0);" />
 							<input id="searchInput" name="searchInput" type="text" placeholder="search term"/>
 							<input type="submit" value="Search" />
 						</form>
-						<a href="javascript: mopod.searchNext10();">Next 10 Results</a>>
+						<div id="nextResultSet"></div>
 					</div>
 				</div>
 			</div>	
@@ -129,11 +131,12 @@
 			</div>	
 			<div id="accountResults">
 				<p>An account is not necessary unless you want to keep a record of your Subscriptions and Later List. If not, your Subscriptions and Later List will disappear when closing your browser.</p>
-				<form method="post" action="javascript:mopod.login();" />
-					<input id="login" name="login" type="text" placeholder="username"/>
+				<form method="post" action="javascript: mopod.login();" />
+					<input id="username" name="username" type="text" placeholder="username"/>
 					<input id="password" name="password" type="password" placeholder="password" />
 					<input type="submit" value="Log In" />
 				</form>
+				<br>
 				<p>Don't have an account?</p>
 				<button onclick="">Register</button>
 			</div>
@@ -141,4 +144,6 @@
 	</div>
 </div>
 		
-<script>mopod.init();</script>
+<script>
+	mopod.init();
+</script>
