@@ -1,6 +1,9 @@
 body { background-color: #212529; color: #fff; }
 
-#playerResult button { display: block; }
+#playerResult button { 
+	display: block; 
+	width: 100%;
+}
 
 .container { max-width: 100%; }
 
@@ -32,9 +35,8 @@ p#logo {
 	margin-bottom: -4px;
 }
 
- .img-fluid {
+.img-fluid {
   width: 100%;
-  max-width: 300px;
 }
 
 #playerResult li {
@@ -64,17 +66,29 @@ span.newEpisode.new {
   filter: opacity(0.75);
 }
 
-audio { background-color: #fff; }
+audio { 
+	background-color: #fff; 
+	width: 100%; 
+}
 
 #audioControls {
-  width: 300px; 
+  width: 100%; 
   display: block; 
 }
 #audioControls img:hover {
   cursor: pointer;
 }
+#audioControls .forward {
+	float: right;
+}
 
+button.disabled {
+	border: none;
+	background-color: rgba(100,100,0,0.75);
+  cursor: none;
+}
 button:hover { cursor: pointer; background-color: #ddd; }
+button.disabled:hover { cursor: none; background-color: rgba(100,100,0,0.75); }
 
 #search form { margin: 0 0 1rem; }
 #searchResults audio { width: 150px; }
@@ -130,6 +144,12 @@ div#subscriptionResults {
 .time {
   margin: -0.75rem 0 2rem;
   font-style: italic;
+}
+
+.ad {
+	background-color: #444;
+	margin-top: -74px;
+  padding-top: 74px;
 }
 
 /* Style the tab */

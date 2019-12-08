@@ -12,7 +12,6 @@
 
 var mopod = 
 {
-  
   // Public objects.
   jObj_subscription: {},
   jObj_subscriptions: {},
@@ -96,9 +95,9 @@ var mopod =
       {
         jObj = JSON.parse(reqObj.response);
         
-        payload += "<span>Category:</span>";
-        payload += "<select id=\"genreDropdown\">";
-        payload += "  <option value=\"all\">ALL</option>";
+        payload += `<span>Category:</span>
+        						<select id=\"genreDropdown\">
+											<option value=\"all\">ALL</option>`;
         
         for(i = 0; i < jObj.length; i++)
         {
@@ -134,28 +133,32 @@ var mopod =
         jObj = JSON.parse(reqObj.response);
         pubDate = new Date(jObj.pub_date_ms);
         
-        payload += "<div class=\"row\">";
-        payload += "<div class=\"col-12\">";      
-        payload += "<button onclick=\"mopod.spinRoulette();\">Spin Again</button>";
-        payload += "<button onclick=\"mopod.insertLaterList('" + jObj.id + "');\">Save for Later</button>";
-        payload += "<button onclick=\"mopod.insertSubscription('" + jObj.podcast_id + "');\">Subscribe</button>";
-        payload += "</div>";
-        payload += "</div><br>";
-        payload += "  <div class=\"row\">";
-        payload += "    <div class=\"col-12 col-lg-4\">";
-        payload += "      <img class=\"img-fluid\" src=\"" + jObj.thumbnail + "\" />";
-        //payload += "      <audio controls><source src=\"" + jObj.audio + "\" /></audio>";
-        payload += "    </div>";
-        payload += "    <div class=\"col-12 col-lg-4\">";
-        payload += "      <h1 class=\"podcastTitle\">" + jObj.podcast_title + "</h1>";
-        payload += "      <p class=\"publisher\">" + jObj.publisher + "</p>";
-        payload += "      <h2 class=\"episodeTitle\"><a class=\"playerIcon\" href=\"javascript: mopod.play('" + jObj.id + "');\">" + jObj.title + "</a></h2>";
-        payload += "      <p class=\"pubDate\">" + pubDate + "</p>";
-        payload += "      <p class=\"episodeDescription\">" + jObj.description + "</p>";
-        payload += "    </div>";
-        payload += "    <div class=\"col-12 col-lg-4\">";
-        payload += "    </div>";
-        payload += "  </div>";
+        let button = "<button onclick=\"mopod.insertSubscription('` + jObj.podcast_id + `');\">SUBSCRIBE</button>";
+        let alreadySubscribed = mopod.isSubscribed(jObj.id);
+        if(alreadySubscribed === true)
+        {
+	        button = "<button class=\"disabled\">subscribed</button>"; 
+        }
+        
+        payload += `<div class=\"row\">
+        							<div class=\"col-12\">      
+												<button onclick=\"mopod.spinRoulette();\">SPIN AGAIN</button>`
+												+ button +
+											 `<button onclick=\"mopod.insertLaterList('` + jObj.id + `');\">DON'T SHOW AGAIN</button></div>
+										</div><br>
+										<div class=\"row\">
+											<div class=\"col-12 col-lg-3\">
+												<img class=\"img-fluid\" src=\"` + jObj.thumbnail + `\" />
+											</div>
+											<div class=\"col-12 col-lg-4\">
+												<h1 class=\"podcastTitle\">` + jObj.podcast_title + `</h1>
+												<p class=\"publisher\">` + jObj.publisher + `</p>
+												<h2 class=\"episodeTitle\"><a class=\"playerIcon\" href=\"javascript: mopod.play('` + jObj.id + `');\">` + jObj.title + `</a></h2>
+												<p class=\"pubDate\">` + pubDate + `</p>
+												<p class=\"episodeDescription\">` + jObj.description + `</p>
+											</div>
+											<div class=\"col-12 col-lg-5\"></div>
+										</div>`;
  
         document.getElementById("rouletteResult").innerHTML = payload;
         
@@ -229,26 +232,25 @@ var mopod =
           for(let i = 0; i < jObj.count; i++)
           {            
 	          result = jObj.results[i];
-            payload += "<div class=\"col-6 col-lg-2 searchResult\" data-episodeid=\"" + null + "\" data-podcastid=\"" + result.id + "\" data-latestms=\"" + result.latest_pub_date_ms + "\">";
-            payload += "<button onclick=\"mopod.insertSubscription();\">Subscribe</button>";
-            payload += "<img class=\"img-fluid\" src=\"" + result.thumbnail + "\" title=\"" + result.description_original + "\"/>";
-            payload += "<button class=\"play\" onclick=\"javascript: mopod.playSubscription();\">Open in Player</button>";
+            payload += `<div class=\"col-6 col-lg-2 searchResult\" data-episodeid=\"` + null + `\" data-podcastid=\"` + result.id + `\" data-latestms=\"` + result.latest_pub_date_ms + `\">
+													<button onclick=\"mopod.insertSubscription();\">SUBSCRIBE</button>
+													<img class=\"img-fluid\" src=\"` + result.thumbnail + `\" title=\"` + result.description_original + `\"/>
+													<button class=\"play\" onclick=\"javascript: mopod.playSubscription();\">OPEN IN PLAYER</button>`;
             if(searchType === "episode")
             {
               payload += "<button onclick=\"mopod.laterList('" + result.id + "');\">Save for Later</button>";
             }
-            payload += "<h2 class=\"podcastTitle\">" + result.title_original + "</h2>";
-            payload += "<p class=\"publisher\">" + result.publisher_original + "</p>";
+            payload += `<h2 class=\"podcastTitle\">` + result.title_original + `</h2>
+            						<p class=\"publisher\">` + result.publisher_original + `</p>`;
 
             if(searchType === "episode")
             {
 	            pubDate = new Date(result.pub_date_ms);
-	            payload += "<h2 class=\"episodeTitle\">";
-              payload += "<a class=\"playerIcon\" href=\"javascript: mopod.play('" + result.id + "');\">";
-							payload += result.title_original;
-              payload += "</a>";        
-	            payload += "</h2>";
-	            payload += "<p class=\"pubDate\">" + pubDate + "</p>";
+	            payload += `<h2 class=\"episodeTitle\">
+              						<a class=\"playerIcon\" href=\"javascript: mopod.play('` + result.id + `');\">` + result.title_original +
+													`</a>        
+													 </h2>
+													 <p class=\"pubDate\">` + pubDate + `</p>`;
 	          }
             payload += "</div>";
           }
@@ -284,75 +286,53 @@ var mopod =
 	  let jObj = {};
 	  let newCounter = 0;
 	    
-	  // Test if object already in memory. If so, don't make API call again.
-	  if(mopod.jObj_subscriptions.length === undefined)
-	  {
-		  console.log("calling API");
-	    let reqObj = new XMLHttpRequest();
-	    let reqUrl = "/getSubscriptions";
-	    
-	    document.getElementById("subscriptionResults").innerHTML = "<img src=\"/static/img/loading.gif\" width=\"50\" />";
-	    
-	    reqObj.open("GET", reqUrl, true);
-	    reqObj.send();
-	
-	    reqObj.onreadystatechange = function()
-	    {
-	      if(reqObj.readyState === 4)
-	      {
-	        mopod.jObj_subscriptions = JSON.parse(reqObj.response);
-	        jObj = mopod.jObj_subscriptions;
-	        
-	        payload += "  <div class=\"col-12\"><p>" + jObj.length + " subscriptions. <span id=\"newCounter\"></span></p></div>";         
-			    payload += "  <div class=\"col-12\">";
-			    payload += "    <button onclick=\"mopod.reloadSubscriptions();\">Refresh</button>";
-			    payload += "  </div>";
+    let reqObj = new XMLHttpRequest();
+    let reqUrl = "/getSubscriptions";
     
-	        // Put "The " to the end.
-	        mopod.theToTheEnd();
-	        // Sort according to title. To do: put in a sort picker.
-	        jObj = mopod.jObj_subscriptions.sort(mopod.compareValues("title", "asc"));		
-					
-	        for(let i = 0; i < jObj.length; i++)
-	        {
-			      payload += mopod.getSubscriptionHTML(jObj[i]);
-			      if(jObj[i].hasListened === 0)
-			      {
-				      newCounter++;
-			      }
-		      }
-	                 
-		      if(payload !== "")
-		      {
-		        document.getElementById("subscriptionResults").innerHTML = payload;
-		        document.getElementById("newCounter").innerHTML = newCounter + " with new episodes.";
-		      }
-		      else
-		      { 
-		        document.getElementById("subscriptionResults").innerHTML = "Add subscriptions in the Roulette or Search panels.";
-		      }      
-	      }
-		  }
-		}
-		// Use cached object.
-    else
-    {
-	    console.log("in memory");
-     	jObj = mopod.jObj_subscriptions;
+    document.getElementById("subscriptionResults").innerHTML = "<img src=\"/static/img/loading.gif\" width=\"50\" />";
+    
+    reqObj.open("GET", reqUrl, true);
+    reqObj.send();
 
-      for(let i = 0; i < jObj.length; i++)
+    reqObj.onreadystatechange = function()
+    {
+      if(reqObj.readyState === 4)
       {
-        for(let j = 0; j < jObj[i].podcasts.length; j++)
-        {
-	        payload += mopod.getSubscriptionHTML(jObj[i].podcasts[j]);
-        }
+        mopod.jObj_subscriptions = JSON.parse(reqObj.response);
+        jObj = mopod.jObj_subscriptions;
         
-      }        
-      if(payload !== "")
-      {
-        document.getElementById("subscriptionResults").innerHTML = payload;
-			}
-    }
+        payload += `  <div class=\"col-12\">
+        								<p>` + jObj.length + ` subscriptions. <span id=\"newCounter\"></span></p>
+        							</div>         
+		    							<div class=\"col-12\">
+												<button onclick=\"mopod.reloadSubscriptions();\">REFRESH</button>
+											</div>`;
+  
+        // Put "The " to the end.
+        mopod.theToTheEnd();
+        // Sort according to title. To do: put in a sort picker.
+        jObj = mopod.jObj_subscriptions.sort(mopod.compareValues("title", "desc"));		
+				
+        for(let i = 0; i < jObj.length; i++)
+        {
+		      payload += mopod.getSubscriptionHTML(jObj[i]);
+		      if(jObj[i].hasListened === 0)
+		      {
+			      newCounter++;
+		      }
+	      }
+                 
+	      if(payload !== "")
+	      {
+	        document.getElementById("subscriptionResults").innerHTML = payload;
+	        document.getElementById("newCounter").innerHTML = newCounter + " with new episodes.";
+	      }
+	      else
+	      { 
+	        document.getElementById("subscriptionResults").innerHTML = "Add subscriptions in the Roulette or Search panels.";
+	      }      
+      }
+	  }
   },
   // Insert into db and also DOM and public jObj.
   insertSubscription: function()
@@ -423,17 +403,17 @@ var mopod =
     {
 	    flag = 1;
     }
-    payload += "<div class=\"col-6 col-lg-2 podcast\" data-podcastid=\"" + jObj.id + "\" data-latestms=\"" + jObj.latest_pub_date_ms + "\" data-latestmopodms=\"" + jObj.latestMopodMs + "\" data-haslistened=\"" + jObj.hasListened + "\">";
-    payload += "  <button class=\"remove\" onclick=\"javascript:mopod.deleteSubscription()\">Unsubscribe</button>";
-    payload += "  <span class=\"newEpisode" + ( flag === 1 ? " new" : "") + "\"></span>";
-    payload += "  <img class=\"img-fluid\" src=\"" + jObj.thumbnail + "\" title=\"" + jObj.description + "\" />";
-    payload += "  <button class=\"play\" onclick=\"javascript: mopod.playSubscription();\">Open in Player</button>";
-    payload += "  <h2 class=\"podcastTitle\">" + jObj.title + "</h2>";
-    payload += "    <p class=\"publisher\">" + jObj.publisher + "</p>";
-    payload += "  <div class=\"episodes\">";
     
-    payload += "  </div>";
-    payload += "</div>";
+    payload += `<div class=\"col-6 col-lg-2 podcast\" data-podcastid=\"` + jObj.id + `\" data-latestms=\"` + jObj.latest_pub_date_ms + `\" data-latestmopodms=\"` + jObj.latestMopodMs + `\" data-haslistened=\"` + jObj.hasListened + `\">
+    							<button class=\"remove\" onclick=\"javascript:mopod.deleteSubscription()\">UNSUBSCRIBE</button>
+									<span class=\"newEpisode` + ( flag === 1 ? " new" : "") + `\"></span>
+									<img class=\"img-fluid\" src=\"` + jObj.thumbnail + `\" title=\"` + jObj.description + `\" />
+									<button class=\"play\" onclick=\"javascript: mopod.playSubscription();\">OPEN IN PLAYER</button>
+									<h2 class=\"podcastTitle\">` + jObj.title + `</h2>
+									<p class=\"publisher\">` + jObj.publisher + `</p>
+									<div class=\"episodes\">
+									</div>
+								</div>`;
 
     return payload;
   },
@@ -453,6 +433,7 @@ var mopod =
     let mopodMs = event.currentTarget.offsetParent.dataset.latestmopodms;
     let hasListened = event.currentTarget.offsetParent.dataset.haslistened;
     let episodes = [];
+    let button = "<button class=\"disabled\">subscribed</button>";
 
     let reqObj, reqUrl;
     reqObj = new XMLHttpRequest();
@@ -474,39 +455,45 @@ var mopod =
           }
         }  
         
-        payload += "  <div class=\"row\">";
-        payload += "    <div class=\"col-12 col-lg-4\" data-podcastid=\"" + jObj.id + "\">";
-        payload += "      <button class=\"remove\" onclick=\"javascript:mopod.deleteSubscription()\">Unsubscribe</button>";
-        payload += "      <img class=\"img-fluid\" src=\"" + jObj.thumbnail + "\" /><br><br>";
-        payload += "      <div id=\"audioControls\">";
-        payload += "        <audio id=\"mainPlayerAudio\" src=\"" + jObj.episodes[0].audio + "\" controls data-podcastid=\"" + jObj.id + "\" data-episodeid=\"" + jObj.episodes[0].id + "\" data-ms=\"" + jObj.episodes[0].pub_date_ms + "\" data-latestmopodms=\"" + mopodMs + "\" data-haslistened=\"" + hasListened + "\" onplay=\"javascript: mopod.hasListened();\">";
-        payload += "        </audio>";
-        payload += "        <img src=\"/static/img/icon_rewind.png\" onclick=\"javascript: mopod.rewind();\" />";
-        payload += "        <img src=\"/static/img/icon_forward.png\" onclick=\"javascript: mopod.forward();\" />";
-        payload += "      </div>";
-        payload += "      <h2 class=\"episodeTitle\">" + jObj.episodes[0].title + "</h2>";
-        payload += "      <p class=\"pubDate\">" + new Date(jObj.episodes[0].pub_date_ms) + "</p>";
-        payload += "      <p class=\"description\">" + jObj.episodes[0].description + "</p>";
-        payload += "    </div>";
-        payload += "    <div class=\"col-12 col-lg-4\">";
-        payload += "      <h1 class=\"podcastTitle\">" + jObj.title + "</h1>";
-        payload += "      <p class=\"publisher\">" + jObj.publisher + "</p>";
-        payload += "      <p class=\"description\">" + jObj.description + "</p>";
-        payload += "      <p>MOST RECENT EPISODES</p>";
-        payload += "      <ol id=\"playerEpisodes\">";
+        status = mopod.isSubscribed(jObj.id);
+        if(status === "false")
+        {
+	        button = "<button class=\"play\" onclick=\"javascript: mopod.insertSubscription();\">SUBSCRIBE</button>";
+        }
+        
+        payload += `  <div class=\"row\">
+        								<div class=\"col-12 col-lg-3\" data-podcastid=\"` + jObj.id + `\">`
+													+ button +
+													`<img class=\"img-fluid\" src=\"` + jObj.thumbnail + `\" /><br><br>							
+													<div id=\"audioControls\">
+														<img class=\"rewind\" src=\"/static/img/icon_rewind.png\" onclick=\"javascript: mopod.rewind();\" />
+														<img class=\"forward\" src=\"/static/img/icon_forward.png\" onclick=\"javascript: mopod.forward();\" />
+														<audio id=\"mainPlayerAudio\" src=\"` + jObj.episodes[0].audio + `\" controls data-podcastid=\"` + jObj.id + `\" data-episodeid=\"` + jObj.episodes[0].id + `\" data-ms=\"` + jObj.episodes[0].pub_date_ms + `\" data-latestmopodms=\"` + mopodMs + `\" data-haslistened=\"` + hasListened + `\" onplay=\"javascript: mopod.hasListened();\">
+														</audio>
+													</div>
+													<h2 class=\"episodeTitle\">` + jObj.episodes[0].title + `</h2>
+													<p class=\"pubDate\">` + new Date(jObj.episodes[0].pub_date_ms) + `</p>
+													<p class=\"description\">` + jObj.episodes[0].description + `</p>
+												</div>
+												<div class=\"col-12 col-lg-4\">
+												<h1 class=\"podcastTitle\">` + jObj.title + `</h1>
+												<p class=\"publisher\">` + jObj.publisher + `</p>
+												<p class=\"description\">` + jObj.description + `</p>
+												<p>MOST RECENT EPISODES</p>
+												<ol id=\"playerEpisodes\">`;
         
         for(let j = 0; j < jObj.episodes.length; j++)
         {
           payload += "      <li " + (j === 0 ? "class=\"active\"" : "") + " data-episodeid=\"" + jObj.episodes[j].id + "\">" + jObj.episodes[j].title + "</li>";
         }
         
-        payload += "      </ol>";               
-        payload += "    </div>";                
-        payload += "    <div class=\"col-12 col-lg-4 ad\">";
-        payload += "      <h2>You may also like...</h2>";
-        payload += "      <div id=\"recos\"></div>";
-        payload += "    </div>";
-        payload += "  </div>";
+        payload += `      </ol>              
+        								</div>                
+												<div class=\"col-12 col-lg-5 ad\">
+													<h2>You may also like...</h2>
+													<div id=\"recos\"></div>
+												</div>
+											</div>`;
 
         document.getElementById("playerResult").innerHTML = payload;
         
@@ -574,7 +561,7 @@ var mopod =
   getRecos: function(id)
   {
     // Get You May Also Like podcasts.
-    let payload = "";
+    let payload = "<div class=\"row\">";
     let reqObj, reqUrl;
     
     reqObj = new XMLHttpRequest();
@@ -590,30 +577,33 @@ var mopod =
 				
 				for(let i = 0; i < jObj.recommendations.length; i++)
 				{
-					payload += mopod.getRecoHTML(jObj.recommendations[i]);
+					payload += mopod.getRecoHTML(id, jObj.recommendations[i]);
       	}
-      	
+      	payload += "</div>";
       	document.getElementById("recos").innerHTML = payload;
     	}
     }
   },
   
   // Get recommendations based on current podcast.
-  getRecoHTML: function(jObj)
+  getRecoHTML: function(id, reco)
   {
     let payload = "";
+    let button = "<button class=\"play\" onclick=\"javascript: mopod.insertSubscription();\">SUBSCRIBE</button>";
     
-    //payload += "<div class=\"row reco\">";
-    payload += " <div class=\"col-3\" data-podcastid=\"" + jObj.id + "\">";
-    payload += "  <button class=\"play\" onclick=\"javascript: mopod.insertSubscription();\">Subscribe</button>";
-    payload += "  <img class=\"img-fluid\" src=\"" + jObj.thumbnail + "\" title=\"" + jObj.description + "\" />";
-    payload += "  <button class=\"play\" onclick=\"javascript: mopod.playSubscription();\">Open in Player</button>";
-    payload += " </div>";
-    payload += " <div class=\"col-3\">";
-    payload += "  <h2 class=\"podcastTitle\">" + jObj.title + "</h2>";
-    payload += "  <p class=\"publisher\">" + jObj.publisher + "</p>";
-    payload += " </div>";
-    //payload += "</div>";
+    let status = mopod.isSubscribed(reco.id);
+    if(status === true)
+    {
+	    button = "<button class=\"disabled\">subscribed</button>";
+    }
+    
+    payload += ` <div class=\"col-3\" data-podcastid=\"` + reco.id + `\">` 
+                  + button +
+								 	 `<img class=\"img-fluid\" src=\"` + reco.thumbnail + `\" title=\"` + reco.description + `\" />
+								 	 <button class=\"play\" onclick=\"javascript: mopod.playSubscription();\">OPEN IN PLAYER</button>
+								   <h2 class=\"podcastTitle\">` + reco.title + `</h2>
+									 <p class=\"publisher\">` + reco.publisher + `</p>
+								</div>`;
     
     return payload;
   },
@@ -987,7 +977,21 @@ var mopod =
 	    }
 	    
 	  }
+  },
+  
+  // Check if the podcast is already subscribed.
+  isSubscribed: function(id)
+  {
+	  for(let i = 0; i < mopod.jObj_subscriptions.length; i++)
+	  {
+		  if(mopod.jObj_subscriptions[i].id === id)
+		  {
+			  return true;
+		  }
+	  }
+	  return false;
   }
+  
 
 }
 // End.
