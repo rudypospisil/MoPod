@@ -25,6 +25,7 @@ p#logo {
   color: #000;
   top: -14px;
   font-size: 3rem;
+  font-weight: bold;
   display: block;
 }
 
@@ -85,7 +86,7 @@ audio {
 button.disabled {
 	border: none;
 	background-color: rgba(100,100,0,0.75);
-  cursor: none;
+  cursor: pointer;
 }
 button:hover { cursor: pointer; background-color: #ddd; }
 button.disabled:hover { cursor: none; background-color: rgba(100,100,0,0.75); }

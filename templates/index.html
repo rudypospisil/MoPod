@@ -4,19 +4,19 @@
 	<div id="tabs" class="tab">
 	  <button class="tabLinks" onclick="mopod.openTab(event, 'player')">Player</button>
 	  <button class="tabLinks active" onclick="mopod.openTab(event, 'roulette')">Roulette</button>
-	  <button class="tabLinks" onclick="mopod.openTab(event, 'search')">Search</button>
+	  <button class="tabLinks" onclick="mopod.openTab(event, 'search')">Discover</button>
 	  <button class="tabLinks" onclick="mopod.openTab(event, 'laterList')">Later List</button>
 	  <button class="tabLinks" onclick="mopod.openTab(event, 'subscriptions')">Subscriptions</button>
 	  <button class="tabLinks" onclick="mopod.openTab(event, 'account')">Account</button>
-	  <p id="logo">mopod</p>
+	  <p id="logo">nutter</p>
 	</div>
 	<p id="lnCredit"><a href="https://www.listennotes.com/" target="_blank">Powered by Listen Notes</a></p>
 	<div id="player" class="tabContent">
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
-					<h1>mopod Player</h1>
-					<div id="playerResult"><p>Choose an episode from Roulette, Search, Later List, or Subscriptions and it will appear here.</div>
+					<h1>nutter Player</h1>
+					<div id="playerResult"><p>Choose an episode from Roulette, Discover, Later List, or Subscriptions and it will appear here.</div>
 				</div>
 			</div>
 		</div>
@@ -26,7 +26,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
-					<h1>mopod Roulette</h1>
+					<h1>nutter Roulette</h1>
 				</div>
 			</div>
 			<div id="rouletteResult" data-episodeid="{{ result["id"] }}" data-podcastid="{{ result["podcast_id"] }}">
@@ -61,7 +61,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
-					<h1>mopod Search</h1>
+					<h1>nutter Search</h1>
 					<div id="searchBox">
 						<input type="radio" id="episode" name="searchType" value="episode">
 						<label for="episode">Episode</label>
@@ -84,7 +84,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
-					<h1>mopod Later List</h1>
+					<h1>nutter Later List</h1>
 				</div>
 			</div>
 			<div class="row">
@@ -97,7 +97,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
-					<h1>mopod Subscriptions</h1>
+					<h1>nutter Subscriptions</h1>
 				</div>
 			</div>	
 			<!--
@@ -126,7 +126,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
-					<h1>mopod Account</h1>
+					<h1>nutter Account</h1>
 				</div>
 			</div>	
 			<div id="accountResults">

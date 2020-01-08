@@ -285,6 +285,10 @@ var mopod =
 	  let payload = "";
 	  let jObj = {};
 	  let newCounter = 0;
+	  let today = new Date();
+		let date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
+		let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+		let updateTime = date+  " " + time;
 	    
     let reqObj = new XMLHttpRequest();
     let reqUrl = "/getSubscriptions";
@@ -303,6 +307,7 @@ var mopod =
         
         payload += `  <div class=\"col-12\">
         								<p>` + jObj.length + ` subscriptions. <span id=\"newCounter\"></span></p>
+        								<p>Last local update: <span id=\"lastUpdateTime\"></span></p>
         							</div>         
 		    							<div class=\"col-12\">
 												<button onclick=\"mopod.reloadSubscriptions();\">REFRESH</button>
@@ -326,6 +331,7 @@ var mopod =
 	      {
 	        document.getElementById("subscriptionResults").innerHTML = payload;
 	        document.getElementById("newCounter").innerHTML = newCounter + " with new episodes.";
+	        document.getElementById("lastUpdateTime").innerHTML = updateTime;
 	      }
 	      else
 	      { 
@@ -333,31 +339,6 @@ var mopod =
 	      }      
       }
 	  }
-  },
-  // Insert into db and also DOM and public jObj.
-  insertSubscription: function()
-  { 
-	  id = event.currentTarget.offsetParent.dataset.podcastid;
-	  
-    reqObj = new XMLHttpRequest();
-    reqUrl = "/insertSubscription?id=" + id;
-    reqObj.open("GET", reqUrl, true);
-    reqObj.send();
-    reqObj.onreadystatechange = function()
-    {
-      if(reqObj.readyState === 4)
-      {
-        jObj = JSON.parse(reqObj.response);
-        mopod.jObj_subscriptions.push(jObj);
-
-        mopod.openTab(null, "subscriptions");
-        document.getElementsByClassName("tabLinks")[4].className += " active";
-
-        podcast = mopod.getSubscriptionHTML(jObj);
-        document.getElementById("subscriptionResults").insertAdjacentHTML("afterbegin", podcast);
-        document.getElementById("subscriptionResults").getElementsByTagName("div")[0].getElementsByTagName("span")[0].classList.add("active")
-      }
-    }
   },
   // Delete from db and also from DOM and jObj.
   deleteSubscription: function()
